@@ -110,4 +110,8 @@ int main(void){
         Sleep(SLEEP_MS);
         fflush(stdout);
     }
+
+    free(handle);
+    free(&csbi);
+    free(Matrix);
 }
