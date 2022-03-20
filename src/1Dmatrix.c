@@ -56,7 +56,6 @@ Cell* InitMatrix(){
 
 void Simulate(Cell* Matrix){
     for (int i = 0; i < CELLS; ++i){
-        Cell cell = Matrix[i];
         float p = ((float)rand() / RAND_MAX);
 
         if (p < STATE_PHASE){
