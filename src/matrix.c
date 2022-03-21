@@ -4,16 +4,18 @@
 #include <time.h>
 #include <math.h>
 #include <stdbool.h>
-#include <conio.h>
 
-#define ACTIVE_P        0.000005// Probability that an inactive cell will become active
+// TODO
+// optimize somehow
+
+#define ACTIVE_P        0.0005  // Probability that an inactive cell will become active
 #define FADE_P          0.002   // Probability that an active cell will become inactive
 #define STATE_PHASE     0.9     // Probability that a cell will randomly change its state
-#define MAX_LIFESPAN    3       // Max number of iterations a cell can stay active
+#define MAX_LIFESPAN    6       // Max number of iterations a cell can stay active
 #define INIT_ACTIVE_P   0.01    // Probability that a cell will be active upon initialization
 #define SLEEP_MS        2       // Time in MS to sleep after printing matrix
-#define WIDTH           50      // Width of the matrix in Cells      
-#define HEIGHT          50      // Height of the matrix in Cells
+#define WIDTH           150     // Width of the matrix in Cells      
+#define HEIGHT          150      // Height of the matrix in Cells
 
 #define WHITE 7
 #define GREEN 2
@@ -27,7 +29,7 @@ void ResetConsole(){
 }
 
 char RandChar(){
-    return 'A' + (rand() % 100);
+    return 'A' + (rand() % 55);
 }
 
 WORD RandColor(){
@@ -36,56 +38,64 @@ WORD RandColor(){
 
 typedef struct{
     char state;
-
-    byte lifespan, to_activate;
+    COORD MatrixPos;
+    byte lifespan;
     bool active;
 }Node;
 
-
-Node* InitMatrix(unsigned int cells){
+Node* InitMatrix(unsigned int cells, COORD InitPos){
     Node* matrix = malloc( sizeof(Node) * cells );
 
     for (int i = 0; i < cells; ++i){
+        COORD MatrixPos;
+        MatrixPos.X = (i % WIDTH) + InitPos.X;
+        MatrixPos.Y = floor((double)i / WIDTH) + InitPos.Y;
+
         matrix[i].state = RandChar();
         matrix[i].active = ((float)rand() / RAND_MAX) < INIT_ACTIVE_P;
-        matrix[i].to_activate = 0;
         matrix[i].lifespan = matrix[i].active;
+        matrix[i].MatrixPos = MatrixPos;
     }
 
     return matrix;
 }
 
-void Simulate(Node* Matrix, unsigned int cells, unsigned int width){
-    for (int i = 0; i < cells; ++i){
-        float p = (float)rand() / RAND_MAX;
-        if (p < STATE_PHASE){ Matrix[i].state = RandChar(); }
+Node* Simulate(Node* Matrix, unsigned int cells, unsigned int width){
+    Node* NewMatrix = malloc( sizeof(Node) * cells );
+    memcpy(NewMatrix, Matrix, sizeof(Node) * cells);
 
-        if (Matrix[i].to_activate + 1 == 3){ Matrix[i].active = true; Matrix[i].to_activate = 0; }
+    float p;
+    int ix;
+    bool xx;
+
+    for (int i = 0; i < cells; ++i){        
+        p = (float)rand() / RAND_MAX;
+        if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
 
         if (Matrix[i].active){
-            if ((p < FADE_P) || (++Matrix[i].lifespan >= MAX_LIFESPAN)){
-                Matrix[i].active = false;
-                Matrix[i].lifespan = 0;
-                Matrix[i].to_activate = 0;
-            }
+            xx = (bool)!(++NewMatrix[i].lifespan == MAX_LIFESPAN);
+            NewMatrix[i].active = xx;
+            if (!NewMatrix[i].active){ NewMatrix[i].lifespan = 0; }
 
-            Matrix[i + width].to_activate++;
+            NewMatrix[i + width].active = true;
         }else{
             if (p < ACTIVE_P){
-                Matrix[i].to_activate++;
+                NewMatrix[i].active = true;
             }
         }
     }
+
+    free(Matrix);
+    return NewMatrix;
 }
 
 void DisplayMatrix(Node* Matrix, unsigned int cells, unsigned int width, WORD* ColorArray){
     for (int i = 0; i < cells; ++i){
         Node n = Matrix[i];
+
+        SetConsoleCursorPosition(handle, n.MatrixPos);
         SetConsoleTextAttribute(handle, ColorArray[n.lifespan]);
-        putchar(n.state);
-        if ((i + 1) % width == 0){
-            putchar('\n');
-        }
+        printf("%c", n.state);
     }
 }
 
@@ -98,31 +108,19 @@ int main(void){
     GetConsoleScreenBufferInfo(handle, &csbi);
     Attrs = csbi.wAttributes;
 
-    unsigned int Width, Height;
-    Width = 100;
-    Height = 50;
-
-    unsigned int cells = Width * Height;
+    unsigned int cells = WIDTH * HEIGHT;
 
     COORD InitPos = csbi.dwCursorPosition;
-
-    for (int i = 0; i < cells; ++i){
-        printf(" ");
-        if ((i + 1) % Width == 0){
-            printf("\n");
-        }
-    }
 
     WORD* Colors = calloc(MAX_LIFESPAN, sizeof(WORD));
     Colors[0] = 0x0;
     Colors[1] = WHITE;
     for (int i = 2; i < MAX_LIFESPAN; ++i){ Colors[i] = GREEN; }
 
-    Node* matrix = InitMatrix(Width * Height);
+    Node* matrix = InitMatrix(cells, InitPos);
 
-    for (int i = 0; i < 10000; ++i){
-        SetConsoleCursorPosition(handle, InitPos);
-        Simulate(matrix, Width * Height, Width);
-        DisplayMatrix(matrix, Width * Height, Width, Colors);
+    while (true){
+        matrix = Simulate(matrix, cells, WIDTH);
+        DisplayMatrix(matrix, cells, WIDTH, Colors);
     }
 }
