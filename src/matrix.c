@@ -14,8 +14,8 @@
 #define MAX_LIFESPAN    6       // Max number of iterations a cell can stay active
 #define INIT_ACTIVE_P   0.01    // Probability that a cell will be active upon initialization
 #define SLEEP_MS        2       // Time in MS to sleep after printing matrix
-#define WIDTH           150     // Width of the matrix in Cells      
-#define HEIGHT          150      // Height of the matrix in Cells
+#define WIDTH           100     // Width of the matrix in Cells      
+#define HEIGHT          25      // Height of the matrix in Cells
 
 #define WHITE 7
 #define GREEN 2
@@ -29,7 +29,7 @@ void ResetConsole(){
 }
 
 char RandChar(){
-    return 'A' + (rand() % 55);
+    return 'A' + (rand() % 25);
 }
 
 WORD RandColor(){
@@ -70,7 +70,6 @@ Node* Simulate(Node* Matrix, unsigned int cells, unsigned int width){
 
     for (int i = 0; i < cells; ++i){        
         p = (float)rand() / RAND_MAX;
-        if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
 
         if (Matrix[i].active){
             xx = (bool)!(++NewMatrix[i].lifespan == MAX_LIFESPAN);
@@ -82,6 +81,7 @@ Node* Simulate(Node* Matrix, unsigned int cells, unsigned int width){
             if (p < ACTIVE_P){
                 NewMatrix[i].active = true;
             }
+            if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
         }
     }
 
@@ -92,10 +92,10 @@ Node* Simulate(Node* Matrix, unsigned int cells, unsigned int width){
 void DisplayMatrix(Node* Matrix, unsigned int cells, unsigned int width, WORD* ColorArray){
     for (int i = 0; i < cells; ++i){
         Node n = Matrix[i];
-
+        
         SetConsoleCursorPosition(handle, n.MatrixPos);
         SetConsoleTextAttribute(handle, ColorArray[n.lifespan]);
-        printf("%c", n.state);
+        fwrite(&n.state, sizeof(char), 1, stdout);
     }
 }
 
