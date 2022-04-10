@@ -96,6 +96,7 @@ void DisplayMatrix(Node* Matrix, unsigned int cells, unsigned int width, WORD* C
     matrix[cells + HEIGHT + 1] = '\0';
 
     fwrite(matrix, sizeof(char), cells + 1, stdout);
+    free(matrix);
 }
 
 int main(void){
@@ -126,6 +127,3 @@ int main(void){
         Sleep(SLEEP_MS);
     }
 }
-
-// *stopped,reason="signal-received",signal-name="SIGSEGV",signal-meaning="Segmentation fault",frame={addr="0x0040170e",func="DisplayMatrix",args=[{name="Matrix",value="0x631480"},{name="cells",value="5000"},{name="width",value="100"},{name="ColorArray",value="0xc11608"}],file="D:\\matrix\\src\\matrix.c",fullname="D:\\matrix\\src\\matrix.c",line="90"},thread-id="1",stopped-threads="all"
-// 
