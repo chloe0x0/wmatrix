@@ -5,9 +5,6 @@
 #include <math.h>
 #include <stdbool.h>
 
-// TODO
-// optimize somehow
-
 #define ACTIVE_P        0.0005  // Probability that an inactive cell will become active
 #define FADE_P          0.002   // Probability that an active cell will become inactive
 #define STATE_PHASE     0.9     // Probability that a cell will randomly change its state
@@ -17,8 +14,7 @@
 #define WIDTH           100      // Width of the matrix in Cells      
 #define HEIGHT          50      // Height of the matrix in Cells
 
-#define WHITE 7
-#define GREEN 2  // 207
+#define GREEN 2
 
 static HANDLE handle;
 static WORD   Attrs;
@@ -30,10 +26,6 @@ void ResetConsole(){
 
 char RandChar(){
     return 'A' + (rand() % 100);
-}
-
-WORD RandColor(){
-    return rand() % 256;
 }
 
 typedef struct{
@@ -63,7 +55,8 @@ Node* Simulate(Node* Matrix, unsigned int cells){
 
     for (int i = 0; i < cells; ++i){        
         p = (float)rand() / RAND_MAX;
-
+        
+        if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
         if (Matrix[i].active){
             NewMatrix[i].active = (bool)!(++NewMatrix[i].lifespan == MAX_LIFESPAN);
             NewMatrix[i].lifespan *= NewMatrix[i].active;
@@ -73,7 +66,6 @@ Node* Simulate(Node* Matrix, unsigned int cells){
             if (p < ACTIVE_P){
                 NewMatrix[i].active = true;
             }
-            if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
         }
     }
 
@@ -89,9 +81,6 @@ void DisplayMatrix(Node* Matrix, unsigned int cells){
 
         Node n = Matrix[i];
         matrix[i] = n.active ? n.state : ' ';
-        // SetConsoleCursorPosition(handle, n.MatrixPos);
-        // SetConsoleTextAttribute(handle, ColorArray[n.lifespan]);
-        // fwrite(&n.state, sizeof(char), 1, stdout);
     }
     matrix[cells + HEIGHT + 1] = '\0';
 
