@@ -34,7 +34,7 @@ typedef struct{
     bool active;
 }Node;
 
-Node* InitMatrix(unsigned int cells, COORD InitPos){
+Node* InitMatrix(unsigned int cells){
     Node* matrix = malloc( sizeof(Node) * cells );
 
     for (int i = 0; i < cells; ++i){
@@ -100,7 +100,7 @@ int main(void){
     unsigned int cells = WIDTH * HEIGHT;
 
     COORD InitPos = csbi.dwCursorPosition;
-    Node* matrix = InitMatrix(cells, InitPos);
+    Node* matrix = InitMatrix(cells);
 
     SetConsoleTextAttribute(handle, GREEN);
     while (true){
