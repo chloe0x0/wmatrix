@@ -11,7 +11,7 @@
 #define MAX_LIFESPAN    5       // Max number of iterations a cell can stay active
 #define INIT_ACTIVE_P   0.01    // Probability that a cell will be active upon initialization
 #define SLEEP_MS        75      // Time in MS to sleep after printing matrix
-#define WIDTH           100      // Width of the matrix in Cells      
+#define WIDTH           100     // Width of the matrix in Cells      
 #define HEIGHT          50      // Height of the matrix in Cells
 
 #define GREEN 2
