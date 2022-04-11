@@ -51,14 +51,13 @@ Node* Simulate(Node* Matrix, unsigned int cells){
     memcpy(NewMatrix, Matrix, sizeof(Node) * cells);
 
     float p;
-    int ix;
 
     for (int i = 0; i < cells; ++i){        
         p = (float)rand() / RAND_MAX;
         
         if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
         if (Matrix[i].active){
-            NewMatrix[i].active = (bool)!(++NewMatrix[i].lifespan == MAX_LIFESPAN);
+            NewMatrix[i].active = !(++NewMatrix[i].lifespan == MAX_LIFESPAN);
             NewMatrix[i].lifespan *= NewMatrix[i].active;
 
             if (i + WIDTH < cells){ NewMatrix[i + WIDTH].active = true; }
