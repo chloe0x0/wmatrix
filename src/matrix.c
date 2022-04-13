@@ -108,4 +108,6 @@ int main(void){
         SetConsoleCursorPosition(handle, InitPos);
         Sleep(SLEEP_MS);
     }
+
+    free(matrix);
 }
