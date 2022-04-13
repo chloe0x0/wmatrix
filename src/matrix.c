@@ -57,7 +57,7 @@ Node* Simulate(Node* Matrix, unsigned int cells){
         
         if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
         if (Matrix[i].active){
-            NewMatrix[i].active = !(++NewMatrix[i].lifespan == MAX_LIFESPAN);
+            NewMatrix[i].active = (++NewMatrix[i].lifespan != MAX_LIFESPAN);
             NewMatrix[i].lifespan *= NewMatrix[i].active;
 
             if (i + WIDTH < cells){ NewMatrix[i + WIDTH].active = true; }
