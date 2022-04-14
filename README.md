@@ -1,2 +1,2 @@
 # matrix
-A matrix terminal in C
+A matrix terminal in C (in windows)
