@@ -19,25 +19,25 @@
 static HANDLE handle;
 static WORD   Attrs;
 
-void ResetConsole(){
+void ResetConsole() {
     SetConsoleTextAttribute(handle, Attrs);
     system("cls");
 }
 
-char RandChar(){
+static inline char RandChar() {
     return 'A' + (rand() % 100);
 }
 
-typedef struct{
+typedef struct {
     char state;
     byte lifespan;
     bool active;
-}Node;
+} Node;
 
-Node* InitMatrix(unsigned int cells){
+Node* InitMatrix(size_t cells) {
     Node* matrix = malloc( sizeof(Node) * cells );
 
-    for (int i = 0; i < cells; ++i){
+    for (int i = 0; i < cells; ++i) {
         matrix[i].state = RandChar();
         matrix[i].active = ((float)rand() / RAND_MAX) < INIT_ACTIVE_P;
         matrix[i].lifespan = matrix[i].active;
@@ -46,23 +46,23 @@ Node* InitMatrix(unsigned int cells){
     return matrix;
 }
 
-Node* Simulate(Node* Matrix, unsigned int cells){
+Node* Simulate(Node* Matrix, size_t cells) {
     Node* NewMatrix = malloc( sizeof(Node) * cells );
     memcpy(NewMatrix, Matrix, sizeof(Node) * cells);
 
     float p;
 
-    for (int i = 0; i < cells; ++i){        
+    for (int i = 0; i < cells; ++i) {        
         p = (float)rand() / RAND_MAX;
         
-        if (p < STATE_PHASE){ NewMatrix[i].state = RandChar(); }
-        if (Matrix[i].active){
+        if (p < STATE_PHASE) { NewMatrix[i].state = RandChar(); }
+        if (Matrix[i].active) {
             NewMatrix[i].active = (++NewMatrix[i].lifespan != MAX_LIFESPAN);
             NewMatrix[i].lifespan *= NewMatrix[i].active;
 
-            if (i + WIDTH < cells){ NewMatrix[i + WIDTH].active = true; }
+            if (i + WIDTH < cells) { NewMatrix[i + WIDTH].active = true; }
         }else{
-            if (p < ACTIVE_P){
+            if (p < ACTIVE_P) {
                 NewMatrix[i].active = true;
             }
         }
@@ -72,11 +72,11 @@ Node* Simulate(Node* Matrix, unsigned int cells){
     return NewMatrix;
 }
 
-void DisplayMatrix(Node* Matrix, unsigned int cells){
+void DisplayMatrix(Node* Matrix, size_t cells) {
     char* matrix = malloc( sizeof(char)*cells + HEIGHT + 1);
 
-    for (int i = 0; i < cells; ++i){
-        if ((i + 1) % WIDTH == 0){ matrix[i] = '\n'; continue; }
+    for (int i = 0; i < cells; ++i) {
+        if ((i + 1) % WIDTH == 0) { matrix[i] = '\n'; continue; }
 
         Node n = Matrix[i];
         matrix[i] = n.active ? n.state : ' ';
@@ -87,7 +87,7 @@ void DisplayMatrix(Node* Matrix, unsigned int cells){
     free(matrix);
 }
 
-int main(void){
+int main(void) {
     atexit(ResetConsole);
     srand(time(NULL));
 
@@ -96,13 +96,13 @@ int main(void){
     GetConsoleScreenBufferInfo(handle, &csbi);
     Attrs = csbi.wAttributes;
 
-    unsigned int cells = WIDTH * HEIGHT;
+    size_t cells = WIDTH * HEIGHT;
 
     COORD InitPos = csbi.dwCursorPosition;
     Node* matrix = InitMatrix(cells);
 
     SetConsoleTextAttribute(handle, GREEN);
-    while (true){
+    while (true) {
         matrix = Simulate(matrix, cells);
         DisplayMatrix(matrix, cells);
         SetConsoleCursorPosition(handle, InitPos);
