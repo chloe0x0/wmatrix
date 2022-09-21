@@ -1,2 +1,2 @@
 # matrix
-A matrix terminal in C (in windows)
+A small cmatrix implementation using the windows api 
