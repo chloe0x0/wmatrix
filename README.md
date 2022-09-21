@@ -7,6 +7,6 @@ A small cmatrix implementation in C using the windows api
 > cd wmatrix
 > make
 
-> matrix.exe
+> wmatrix.exe
 ......
 ```
